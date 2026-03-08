@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── Favicon ── -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23ff3b30'/><text y='72' x='50' text-anchor='middle' font-size='60' font-family='system-ui' font-weight='900' fill='white'>G</text></svg>" />
+
+    <!-- ── SEO Meta ── -->
+    <title>GOEL — Post-Earthquake Survivor Localization</title>
+    <meta name="description" content="GOEL is a hybrid AI system combining CNN, ANN, Fuzzy Logic, and PSO to detect earthquake survivors within the critical 72-hour golden window." />
+    <meta name="theme-color" content="#ff3b30" />
+
+    <!-- ── Open Graph ── -->
+    <meta property="og:title"       content="GOEL — Post-Earthquake Survivor Localization" />
+    <meta property="og:description" content="Hybrid AI: CNN · ANN · Fuzzy Logic · PSO for disaster rescue operations." />
+    <meta property="og:type"        content="website" />
+
+    <!-- ── Fonts ── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <style>
+      /* ── Loading splash — shows before React mounts ── */
+      #splash {
+        position: fixed; inset: 0; z-index: 99999;
+        background: #000;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 20px;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+      #splash-logo {
+        width: 60px; height: 60px; border-radius: 20px;
+        background: linear-gradient(135deg, #ff3b30, #ff6b35);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 40px rgba(255,59,48,0.5);
+        animation: splashPulse 1.2s ease-in-out infinite alternate;
+      }
+      #splash-logo svg { width: 28px; height: 28px; }
+
+      #splash-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px; font-weight: 700;
+        letter-spacing: 0.14em; color: #3a3a3c;
+        text-transform: uppercase;
+        animation: splashFade 1.2s ease-in-out infinite alternate;
+      }
+
+      #splash-bar {
+        width: 120px; height: 2px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 100px; overflow: hidden;
+      }
+      #splash-fill {
+        height: 100%; background: linear-gradient(to right, #ff3b30, #ff6b35);
+        border-radius: 100px;
+        animation: splashLoad 1.4s cubic-bezier(0.22,1,0.36,1) forwards;
+      }
+
+      @keyframes splashPulse {
+        from { box-shadow: 0 0 30px rgba(255,59,48,0.4); transform: scale(1);    }
+        to   { box-shadow: 0 0 60px rgba(255,59,48,0.7); transform: scale(1.06); }
+      }
+      @keyframes splashFade {
+        from { opacity: 0.4; } to { opacity: 1; }
+      }
+      @keyframes splashLoad {
+        from { width: 0%; } to { width: 100%; }
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #000; }
+    </style>
+  </head>
+
+  <body>
+    <!-- Splash screen -->
+    <div id="splash">
+      <div id="splash-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div id="splash-text">Initializing GOEL Systems</div>
+      <div id="splash-bar"><div id="splash-fill"></div></div>
+    </div>
+
+    <!-- React root -->
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const splash = document.getElementById('splash')
+          if (splash) splash.classList.add('hidden')
+        }, 1500)
+      })
+    </script>
+  </body>
+</html>

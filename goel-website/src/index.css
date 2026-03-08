@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+
+body {
+  background: #f2f2f7;
+  color: #1d1d1f;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+
+/* ── Dark Scrollbar ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #555555; }
+* { scrollbar-width: thin; scrollbar-color: #333333 #0a0a0a; }
+
+
+/* ── Gradient Text ── */
+.tg {
+  background: linear-gradient(135deg, #1d1d1f 0%, #6e6e73 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tg-red {
+  background: linear-gradient(135deg, #e8321c 0%, #f05a20 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+/* ── Keyframes ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+@keyframes spinAnim {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes scanLine {
+  0%   { top: -2%;  opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 102%; opacity: 0; }
+}
+@keyframes gradShift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(232,50,28,0.25); }
+  50%      { box-shadow: 0 0 44px rgba(232,50,28,0.5); }
+}
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(232,50,28,0.2); }
+  50%      { border-color: rgba(232,50,28,0.45); }
+}
+@keyframes drawLine {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes particleFloat {
+  0%   { transform: translateY(0) translateX(0);        opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-80px) translateX(20px); opacity: 0; }
+}
+@keyframes ripple {
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes splashPulse {
+  from { box-shadow: 0 0 30px rgba(232,50,28,0.35); transform: scale(1); }
+  to   { box-shadow: 0 0 60px rgba(232,50,28,0.6);  transform: scale(1.06); }
+}
+@keyframes splashFade {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+@keyframes splashLoad {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+
+/* ── Animation Classes ── */
+.anim-fadeUp     { animation: fadeUp     0.65s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-fadeIn     { animation: fadeIn     0.5s  ease both; }
+.anim-slideLeft  { animation: slideLeft  0.65s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-slideRight { animation: slideRight 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-scaleUp    { animation: scaleUp    0.65s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-float      { animation: floatUp    3.5s  ease-in-out infinite; }
+.anim-pulse-dot  { animation: pulseDot   2s    ease-in-out infinite; }
+.anim-spin       { animation: spinAnim   0.75s linear infinite; }
+.anim-glow       { animation: glowPulse  2.5s  ease-in-out infinite; }
+
+
+/* ── Stagger Delays ── */
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.12s; }
+.d3 { animation-delay: 0.19s; }
+.d4 { animation-delay: 0.26s; }
+.d5 { animation-delay: 0.33s; }
+.d6 { animation-delay: 0.40s; }
+.d7 { animation-delay: 0.47s; }
+.d8 { animation-delay: 0.54s; }
+
+
+/* ── Map ── */
+.leaflet-container {
+  background: #e8e8ed !important;
+  border-radius: 0 !important;
+}
+.leaflet-tile {
+  filter: brightness(1.05) saturate(0.7) contrast(0.95) !important;
+}
+.leaflet-control-zoom a {
+  background: rgba(255,255,255,0.95) !important;
+  color: #3a3a3c !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  backdrop-filter: blur(12px) !important;
+}
+.leaflet-control-zoom a:hover {
+  color: #1d1d1f !important;
+  background: rgba(255,255,255,1) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(255,255,255,0.8) !important;
+  color: #aeaeb2 !important;
+  font-size: 9px !important;
+}
+
+
+/* ── Scan Line ── */
+.map-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  z-index: 450;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.85) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  mix-blend-mode: screen;
+  animation: scanLine 3.5s cubic-bezier(0.22,1,0.36,1) infinite;
+}

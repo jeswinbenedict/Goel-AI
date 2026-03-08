@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import Navbar             from './components/Navbar'
 import ToastNotifications from './components/ToastNotifications'
 import KeyboardShortcuts  from './components/KeyboardShortcuts'
@@ -8,7 +8,7 @@ import NotFound           from './pages/NotFound'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Navbar />
       <ToastNotifications />
       <KeyboardShortcuts />
@@ -17,6 +17,6 @@ export default function App() {
         <Route path="/about" element={<About />}    />
         <Route path="*"      element={<NotFound />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }

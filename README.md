@@ -23,7 +23,7 @@ Survival probability drops to near zero after 72 hours. The system respects that
 
 ## System Overview
 
-![GOEL — Post-Earthquake Survivor Localization System](assets/Goel.png)
+![GOEL](assets/Goel.png)
 
 **Operation TOKYO-EQ-2026. Active.**
 
@@ -35,9 +35,7 @@ The system does not wait for instructions. It starts the moment an earthquake is
 
 ## Live Operations Dashboard
 
-![Live Operations Dashboard](assets/Live_operations.png)
-
-Four numbers that determine the operation:
+![Live Operations Dashboard](assets/Live%20operations.png)
 
 | Metric | Value | Status |
 |--------|-------|--------|
@@ -45,8 +43,6 @@ Four numbers that determine the operation:
 | Rescue Teams Active | 6 | 3 currently en route |
 | Critical Zones | 3 | Immediate action required |
 | Hours Since Quake | 18 | 54 hours remaining |
-
-The Fuzzy Inference System classifies every zone continuously using IF-THEN rule chains derived from 10,000+ historical rescue records. No zone goes unscored. No signal goes unprocessed.
 
 | Classification | Score | Directive |
 |----------------|-------|-----------|
@@ -60,12 +56,7 @@ The rescue map renders live via Leaflet and OpenStreetMap. Every marker is a rea
 
 ## Mission Status — 72-Hour Countdown
 
-![Mission Status and 72-Hour Countdown](assets/Mission_Status.png)
-
-```
-Elapsed:    18h     ████░░░░░░░░░░░░░░░░    25.1% of window consumed
-Remaining:  53h 56m
-```
+![Mission Status](assets/Mission%20Status.png)
 
 | Metric | Progress | Rate |
 |--------|----------|------|
@@ -80,21 +71,15 @@ The window does not pause. The system does not pause. Every update you see on th
 
 ## Field Intelligence — Survivor Detection and Route Optimization
 
-![Field Intelligence — Neural Detection and PSO Routing](assets/Field_intelligence.png)
+![Field Intelligence](assets/Field%20intelligence.png)
 
 ### Neural Network Detection
 
 The CNN analyzes thermal drone imagery frame by frame. Each detection is assigned a location, temperature reading, pulse status, and confidence score. High-confidence detections trigger immediate team dispatch without waiting for human confirmation.
 
-```
-Survivor #1   Block A · Floor 2   37.2C   Pulse Detected   CNN: 94%   [CRITICAL]
-Survivor #2   Block C · Floor 1   36.8C   Pulse Detected   CNN: 88%   [CRITICAL]
-Survivor #3   Block B · Floor 3   35.1C   Pulse Detected   CNN: 71%   [MODERATE]
-```
-
 ### Particle Swarm Optimization Routing
 
-Route optimization is not a human decision in GOEL. It is a computation. The PSO engine runs 30 particles across 100 iterations and returns the mathematically shortest path that covers all active survivors. It recalculates every 30 seconds as conditions change.
+Route optimization is not a human decision in GOEL. It is a computation. The PSO engine runs 30 particles across 100 iterations and returns the mathematically shortest path that covers all active survivors.
 
 | Team | Members | Assignment | Distance | ETA |
 |------|---------|-----------|----------|-----|
@@ -106,39 +91,27 @@ Route optimization is not a human decision in GOEL. It is a computation. The PSO
 
 ## AI Analysis and Live Seismic Intelligence
 
-![AI Thermal Analysis and USGS Earthquake Feed](assets/AI_analysis_seismic_data.png)
+![AI Analysis and Seismic Data](assets/AI%20analysis%26seismic%20data.png)
 
 ### CNN Thermal Imaging
 
-Upload any thermal image from the field. The backend runs it through the convolutional network and returns survivor bounding boxes, heat signature intensity maps, and zone classifications. The model was trained specifically on post-collapse thermal signatures, not general object detection.
+Upload any thermal image from the field. The backend runs it through the convolutional network and returns survivor bounding boxes, heat signature intensity maps, and zone classifications.
 
 ### USGS Live Earthquake Feed
 
 The system connects directly to the United States Geological Survey real-time API. Every registered seismic event appears within seconds of detection.
 
-```
-M 5.5   MOD     2 km SSE of Rodotopi, Greece          3/8/2026    10km depth
-M 6.3   STRONG  181 km SE of Kirakira, Solomon Is      3/6/2026    8682km depth
-M 6.4   STRONG  224 km ESE of Attu Station, Alaska     3/4/2026    10km depth
-```
-
-A new M5.6 event at 12km depth is already in the feed. The system registered it before most news outlets.
-
 ---
 
 ## Live Diagnostics — Waveform Analysis and Fuzzy Logic
 
-![Live Diagnostics — Seismic Waveforms and Fuzzy Logic Tester](assets/Live_diagnostics.png)
+![Live Diagnostics](assets/Live%20diagnostics.png)
 
 ### Seismic Waveform Rendering
 
-P-waves and S-waves are plotted in real time against ambient background noise. The gap between P-wave arrival (t=15s) and S-wave arrival (t=35s) allows the system to estimate distance to epicenter before secondary damage occurs.
-
-*Current event: Magnitude 7.2 · Depth 12km · Tokyo, Japan*
+P-waves and S-waves are plotted in real time against ambient background noise. The gap between P-wave arrival and S-wave arrival allows the system to estimate distance to epicenter before secondary damage occurs.
 
 ### Fuzzy Logic Inference Engine
-
-The fuzzy logic tester accepts three inputs and runs live inference through the Flask backend. The output is a composite rescue priority score, not a binary yes/no.
 
 | Input Parameter | Current Value |
 |-----------------|---------------|
@@ -146,80 +119,43 @@ The fuzzy logic tester accepts three inputs and runs live inference through the 
 | Void Probability | 65% |
 | Signal Strength | 55% |
 
-```
-Fuzzy Output Zone:   MODERATE
-Composite Score:     66
-
-Weighted breakdown:
-  Heat   x 0.45  =  32
-  Void   x 0.35  =  23
-  Signal x 0.20  =  11
-
-System Directive: Deploy within 2 hours
-```
-
 No black box. Every inference weight is visible and adjustable.
 
 ---
 
 ## AI Model Visualizers — CNN Confidence and ANN Prediction
 
-![AI Model Visualizers — CNN and ANN Output](assets/AI_model_visualizers.png)
+![AI Model Visualizers](assets/AI%20model%20visualizers.png)
 
 ### CNN Confidence Output
 
-Scores above 70% trigger automatic dispatch. The threshold exists because below 70%, false positive rates climb to levels that misallocate rescue teams. Above 70%, the cost of inaction exceeds the cost of action.
-
-Survivors S#1 and S#2 are well above threshold. S#3 and S#4 sit in the moderate band. S#5 is above floor. All are being tracked.
+Scores above 70% trigger automatic dispatch. Below 70%, false positive rates climb to levels that misallocate rescue teams.
 
 ### ANN Survival Predictor
 
-The artificial neural network estimates survival probability based on structural and seismic inputs. Every variable is adjustable. The model recalculates on every change.
-
-```
-Input Configuration:
-  Building Type:         Reinforced Concrete
-  Floor Number:          2F
-  Earthquake Magnitude:  7M
-
-Model Output:
-  Survival Probability:  51%   [POSSIBLE]
-  Void Probability:      52%
-  Building Class:        Reinforced
-```
-
-Trained on 10,000+ verified earthquake rescue records. Not synthetic data.
+The artificial neural network estimates survival probability based on structural and seismic inputs. Trained on 10,000+ verified earthquake rescue records. Not synthetic data.
 
 ---
 
 ## Swarm Optimization — PSO Live Visualization
 
-![Swarm Optimization Live — PSO Route Optimizer](assets/Swarm_optimization_live.png)
+![Swarm Optimization Live](assets/Swarm%20optimization%20live.png)
 
 **2,375 iterations. 26 particles. Converging.**
 
-The visualization is not decorative. It is the actual optimizer running in the browser canvas. Each particle represents a candidate rescue route. The swarm converges on the lowest-cost solution that services all active survivors.
-
-```
-Algorithm:   Particle Swarm Optimization
-Parameters:  w=0.72   c1=1.5   c2=2.0
-Particles:   26 active
-Iterations:  2,375 and counting
-```
-
-Priority rings on the canvas correspond directly to survivor urgency. Red for critical. Yellow for moderate. Green for low. The routes the teams are currently executing were computed by this exact engine.
+| Parameter | Value |
+|-----------|-------|
+| Algorithm | Particle Swarm Optimization |
+| Inertia (w) | 0.72 |
+| c1 | 1.5 |
+| c2 | 2.0 |
+| Particles | 26 active |
 
 ---
 
 ## AI Pipeline Architecture
 
-![AI Pipeline Architecture](assets/AI_pipeline_architecture.png)
-
-The full processing chain from raw drone input to rescue dispatch:
-
-```
-Drone Input  -->  CNN  -->  ANN  -->  Fuzzy Logic  -->  PSO  -->  Rescue Dispatch
-```
+![AI Pipeline Architecture](assets/AI%20pipeline%20architecture.png)
 
 | Stage | Model | Function | Accuracy |
 |-------|-------|----------|----------|
@@ -227,8 +163,6 @@ Drone Input  -->  CNN  -->  ANN  -->  Fuzzy Logic  -->  PSO  -->  Rescue Dispatc
 | 2 | ANN | Structural survival probability computation | 91.7% |
 | 3 | Fuzzy Logic | Zone classification via 48 IF-THEN rules | 48 rules |
 | 4 | PSO | Multi-team route optimization | 30 particles |
-
-**Operational benchmarks:**
 
 | Benchmark | Target | Current |
 |-----------|--------|---------|
@@ -241,58 +175,20 @@ Drone Input  -->  CNN  -->  ANN  -->  Fuzzy Logic  -->  PSO  -->  Rescue Dispatc
 
 ## Mission Report and Survivor Timeline
 
-![Mission Report and Survivor Timeline](assets/Mission_report_timeline.png)
+![Mission Report and Timeline](assets/Mission%20report%26timeline.png)
 
-The complete operational record. Every event logged by the system automatically.
-
-```
-T+00:00   [TRIGGER]    Earthquake Detected
-                       M7.2 — USGS API activated GOEL response protocol
-
-T+00:04   [DEPLOY]     Thermal Drones Airborne
-                       3 units — 4.2 km2 search area — feeds live to CNN
-
-T+00:18   [DETECT]     Survivor #1 Located
-                       CNN 94% confidence — Block A, Floor 2 — CRITICAL
-
-T+00:25   [DETECT]     Survivor #2 Located
-                       CNN 88% confidence — Block C, Floor 1 — CRITICAL
-
-T+00:41   [DISPATCH]   Alpha Team Deployed
-                       PSO route calculated — Block A — ETA 8 minutes
-
-T+01:12   [DETECT]     Survivor #3 and #4 Located
-                       Fuzzy Logic MODERATE — ANN void probability elevated
-
-T+02:00   [RESCUED]    Survivor #1 Extracted
-                       Alpha Team confirmed — transferred to medical unit
-
-T+06:30   [RESCUED]    Survivor #2 Extracted
-                       Alpha Team second extraction confirmed
-
-T+18:00   [ACTIVE]     Current State
-                       6 teams deployed — 7 rescued — 7 operations ongoing
-
-T+??:??   [OBJECTIVE]  Full Extraction
-                       All 14 survivors out before T+72:00
-```
-
-The full report exports to a professional PDF with one button press. Every score, every timestamp, every team movement — included.
+The complete operational record. Every event logged by the system automatically. The full report exports to a professional PDF with one button press.
 
 ---
 
 ## Architecture
 
-```
-Frontend    React 19 + Tailwind CSS v4 + Vite          Port 5174
-Backend     Flask REST API                              Port 5000
-Mapping     Leaflet + OpenStreetMap
-AI Engine   CNN, ANN, Fuzzy Logic, PSO — Python
-Live Data   USGS Earthquake API
-Deployment  Vercel / Netlify + Render / Railway
-```
-
-**API Surface:**
+Frontend — React 19 + Tailwind CSS v4 + Vite — Port 5174
+Backend  — Flask REST API                  — Port 5000
+Mapping  — Leaflet + OpenStreetMap
+AI       — CNN, ANN, Fuzzy Logic, PSO — Python
+Data     — USGS Earthquake API
+Deploy   — Vercel + Render
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -307,42 +203,27 @@ Deployment  Vercel / Netlify + Render / Railway
 
 ## Installation
 
-```bash
-git clone https://github.com/YOUR_USERNAME/goel-ai.git
-cd goel-ai
-
-# Start backend
-cd backend
-pip install -r requirements.txt
-python app.py
-
-# Start frontend — new terminal
-cd frontend
-npm install
-npm run dev
-```
-
-System is live at `http://localhost:5174`.
+1. git clone https://github.com/jeswinbenedict/Goel-AI.git
+2. cd Goel-AI/backend
+3. pip install -r requirements.txt
+4. python app.py
+5. Open new terminal — cd Goel-AI/goel-website/src
+6. npm install
+7. npm run dev
+8. Open http://localhost:5174
 
 ---
 
 ## Test Coverage
 
-```bash
-cd backend
-python -m pytest tests/ -v
-```
+test_health_endpoint — PASSED
+test_fuzzy_score — PASSED
+test_optimize_routes — PASSED
+test_earthquake_live — PASSED
+test_analyze_thermal — PASSED
+test_status_endpoint — PASSED
 
-```
-test_health_endpoint      PASSED
-test_fuzzy_score          PASSED
-test_optimize_routes      PASSED
-test_earthquake_live      PASSED
-test_analyze_thermal      PASSED
-test_status_endpoint      PASSED
-
-6 passed in 0.84s    Coverage: 100%
-```
+6 passed in 0.84s — Coverage 100%
 
 ---
 

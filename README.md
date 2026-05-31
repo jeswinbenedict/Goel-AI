@@ -229,7 +229,7 @@ test_status_endpoint — PASSED
 
 ## License
 
-MIT. Use it. Improve it. Deploy i.
+MIT. Use it. Improve it. Deploy it.
 
 ---
 

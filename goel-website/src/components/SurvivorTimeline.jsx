@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { CheckCircle2, Clock, AlertCircle, Radio, HeartPulse } from 'lucide-react'
 import { C, card, cardHover } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
-const EVENTS = [
+const DEFAULT_EVENTS = [
   { time: '00:00', label: 'Earthquake Detected',      desc: 'M7.2 event — USGS API triggered system activation',        color: C.red,    Icon: AlertCircle,  status: 'done'    },
   { time: '00:04', label: 'Thermal Drones Deployed',   desc: '3 drones covering 4.2km² of affected zone',               color: C.orange, Icon: Radio,        status: 'done'    },
   { time: '00:18', label: 'Survivor #1 Detected',      desc: 'CNN 94% confidence · Block A Floor 2 · Critical zone',    color: C.red,    Icon: HeartPulse,   status: 'done'    },
@@ -11,15 +12,18 @@ const EVENTS = [
   { time: '00:41', label: 'Alpha Team Dispatched',     desc: 'PSO optimal route → Block A · ETA 8 min',                 color: C.green,  Icon: CheckCircle2, status: 'done'    },
   { time: '01:12', label: 'Survivor #3 & #4 Detected', desc: 'Fuzzy Logic MODERATE zone · ANN void probability 78%',   color: C.yellow, Icon: HeartPulse,   status: 'done'    },
   { time: '02:00', label: 'Survivor #1 Rescued',       desc: 'Alpha Team confirmed rescue · Transported to hospital',   color: C.green,  Icon: CheckCircle2, status: 'done'    },
-  { time: '06:30', label: 'Survivor #2 Rescued',       desc: 'Alpha Team second extraction complete',                   color: C.green,  Icon: CheckCircle2, status: 'done'    },
-  { time: '18:00', label: 'Active Operations',         desc: '6 teams deployed · 7 rescued · 7 operations ongoing',    color: C.blue,   Icon: Clock,        status: 'current' },
-  { time: '??:??', label: 'Target: Full Rescue',       desc: 'All 14 survivors recovered before 72hr window closes',   color: C.t4,     Icon: CheckCircle2, status: 'pending' },
 ]
 
 export default function SurvivorTimeline() {
   const [ref, inView] = useInView()
   const [hov, setHov] = useState(false)
   const [expanded, setExpanded] = useState(null)
+  const { timeline } = useRealtime()
+
+  const events = timeline && timeline.length > 0 ? timeline.map(e => ({
+    ...e,
+    Icon: e.label.includes('Rescued') ? CheckCircle2 : e.label.includes('Detected') ? HeartPulse : e.label.includes('Dispatched') ? CheckCircle2 : AlertCircle
+  })) : DEFAULT_EVENTS
 
   return (
     <div
@@ -38,7 +42,7 @@ export default function SurvivorTimeline() {
         <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: C.t4, textTransform: 'uppercase', marginBottom: '4px' }}>
           Operation History
         </div>
-        <h2 style={{ fontSize: '16px', fontWeight: 700, color: C.t1 }}>Survivor Timeline</h2>
+        <h2 style={{ fontSize: '16px', fontWeight: 700, color: C.t1 }}>Survivor Timeline ({events.length} Events)</h2>
       </div>
 
       {/* Timeline */}
@@ -54,11 +58,12 @@ export default function SurvivorTimeline() {
           transition: 'height 1.5s cubic-bezier(0.22,1,0.36,1) 0.3s',
         }} />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {EVENTS.map((ev, i) => {
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '400px', overflowY: 'auto' }}>
+          {events.map((ev, i) => {
             const isExpanded = expanded === i
             const isCurrent  = ev.status === 'current'
             const isPending  = ev.status === 'pending'
+            const EventIcon = ev.Icon || CheckCircle2
 
             return (
               <div
@@ -83,7 +88,7 @@ export default function SurvivorTimeline() {
                     transition: 'transform 0.2s ease',
                     ...(isCurrent ? { boxShadow: `0 0 16px ${ev.color}50`, animation: 'glowPulse 2s ease-in-out infinite' } : {}),
                   }}>
-                    <ev.Icon size={15} color={isPending ? C.t4 : ev.color} strokeWidth={1.75} />
+                    <EventIcon size={15} color={isPending ? C.t4 : ev.color} strokeWidth={1.75} />
                   </div>
                 </div>
 

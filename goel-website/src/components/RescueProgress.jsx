@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CheckCircle2, Clock, AlertCircle, Users, TrendingUp } from 'lucide-react'
 import { C, card, cardHover, progressTrack, progressFill } from '../styles/theme'
 import { useInView, useCounter } from '../hooks/useInView'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
 const OPERATIONS = [
   { label: 'Survivors Detected',  done: 14, total: 14, color: C.red,    icon: AlertCircle  },
@@ -66,7 +67,21 @@ function ProgressRow({ op, inView, delay }) {
 export default function RescueProgress() {
   const [ref, inView] = useInView()
   const [hov, setHov] = useState(false)
-  const rescued = useCounter(7, 1600, inView)
+  const { stats, survivors, teams } = useRealtime()
+
+  const totalDetected = stats?.survivors_detected ?? survivors?.length ?? 14
+  const totalRescued = stats?.survivors_rescued ?? survivors?.filter(s => s.status === 'rescued').length ?? 7
+  const activeTeams = stats?.teams_active ?? teams?.length ?? 6
+  const overallPct = totalDetected > 0 ? Math.round((totalRescued / totalDetected) * 100) : 0
+
+  const rescuedCount = useCounter(totalRescued, 1600, inView)
+
+  const operations = [
+    { label: 'Survivors Detected',  done: totalDetected, total: totalDetected, color: C.red,    icon: AlertCircle  },
+    { label: 'Rescue Dispatched',   done: Math.min(activeTeams + totalRescued, totalDetected), total: totalDetected, color: C.orange, icon: Users },
+    { label: 'Active Operations',   done: activeTeams,  total: Math.max(activeTeams, 1), color: C.yellow, icon: Clock        },
+    { label: 'Successfully Rescued',done: totalRescued, total: totalDetected, color: C.green,  icon: CheckCircle2 },
+  ]
 
   return (
     <div
@@ -90,7 +105,7 @@ export default function RescueProgress() {
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: '36px', fontWeight: 800, color: C.green, letterSpacing: '-0.04em', lineHeight: 1 }}>
-            {inView ? rescued : 0}
+            {inView ? rescuedCount : 0}
           </div>
           <div style={{ fontSize: '11px', color: C.t3, fontWeight: 500 }}>Rescued</div>
         </div>
@@ -106,12 +121,12 @@ export default function RescueProgress() {
             <TrendingUp size={12} color={C.green} strokeWidth={2} />
             Overall Mission Progress
           </span>
-          <span style={{ fontWeight: 800, color: C.green }}>50%</span>
+          <span style={{ fontWeight: 800, color: C.green }}>{overallPct}%</span>
         </div>
         <div style={{ ...progressTrack, height: '8px' }}>
           <div style={{
             height: '100%', borderRadius: '100px',
-            width: inView ? '50%' : '0%',
+            width: inView ? `${overallPct}%` : '0%',
             background: `linear-gradient(to right, ${C.green}, ${C.blue})`,
             boxShadow: `0 0 16px ${C.green}50`,
             transition: 'width 1.6s cubic-bezier(0.22,1,0.36,1)',
@@ -121,7 +136,7 @@ export default function RescueProgress() {
 
       {/* Individual rows */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {OPERATIONS.map((op, i) => (
+        {operations.map((op, i) => (
           <ProgressRow key={op.label} op={op} inView={inView} delay={i * 0.08} />
         ))}
       </div>

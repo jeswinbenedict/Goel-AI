@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Navigation, Users, MapPin, Clock, Zap, RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { C, card, cardHover, badge, label } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
 import { api } from '../api/client'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
 const STATIC_TEAMS = [
   { name: 'Alpha Team',   n: 4, target: 'Survivor #1 & #2 — Block A',     dist: '0.4 km', eta: '8 min',  status: 'EN ROUTE',  color: C.red    },
@@ -88,9 +89,35 @@ export default function RouteOptimizer() {
   const [loading, setLoading] = useState(false)
   const [source,  setSource]  = useState(null)
   const [meta,    setMeta]    = useState(null)
+  const { routes: realtimeRoutes, requestPSO, connected } = useRealtime()
+
+  useEffect(() => {
+    if (realtimeRoutes && realtimeRoutes.routes) {
+      const apiTeams = realtimeRoutes.routes.map((r, i) => ({
+        name:   r.team,
+        target: `${r.target} — PSO Optimized`,
+        status: 'PSO ASSIGNED',
+        color:  TEAM_COLORS[i] ?? C.purple,
+        cost:   r.team_pos && r.surv_pos
+          ? (Math.sqrt(
+              Math.pow(r.team_pos[0] - r.surv_pos[0], 2) +
+              Math.pow(r.team_pos[1] - r.surv_pos[1], 2)
+            ) * 111).toFixed(2) + ' km'
+          : null,
+      }))
+      setTeams(apiTeams)
+      setMeta({ cost: realtimeRoutes.total_cost, iters: realtimeRoutes.iterations, particles: realtimeRoutes.particles })
+      setSource(connected ? 'websocket' : 'backend')
+    }
+  }, [realtimeRoutes, connected])
 
   const optimize = async () => {
     setLoading(true)
+    if (connected) {
+      requestPSO()
+      setTimeout(() => setLoading(false), 500)
+      return
+    }
     try {
       const data = await api.optimizeRoutes(SURVIVORS, TEAM_POS)
       const apiTeams = data.routes.map((r, i) => ({

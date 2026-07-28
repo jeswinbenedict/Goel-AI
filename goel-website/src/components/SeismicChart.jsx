@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Activity, Radio } from 'lucide-react'
 import { C, card, cardHover } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
 function generateWave(pts = 60) {
   return Array.from({ length: pts }, (_, i) => {
@@ -35,11 +36,18 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function SeismicChart() {
   const [ref, inView] = useInView()
   const [hov, setHov] = useState(false)
+  const { seismicBuffer, connected } = useRealtime()
   const [data, setData] = useState(generateWave)
   const [live, setLive] = useState(false)
 
   useEffect(() => {
-    if (!live) return
+    if (connected && seismicBuffer && seismicBuffer.length > 0) {
+      setData(seismicBuffer)
+    }
+  }, [seismicBuffer, connected])
+
+  useEffect(() => {
+    if (!live || connected) return
     const t = setInterval(() => {
       setData(prev => {
         const next = [...prev.slice(1), {
@@ -50,7 +58,7 @@ export default function SeismicChart() {
       })
     }, 200)
     return () => clearInterval(t)
-  }, [live])
+  }, [live, connected])
 
   return (
     <div

@@ -2,15 +2,9 @@ import { useState } from 'react'
 import { HeartPulse, Users, AlertTriangle, Clock, TrendingUp } from 'lucide-react'
 import { C, card, cardHover, badge } from '../styles/theme'
 import { useInView, useCounter } from '../hooks/useInView'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
-const CARDS = [
-  { Icon: HeartPulse,    val: 14, lbl: 'Survivors Detected',  sub: '+2 in last hour',       color: C.red,    tag: 'Critical', trend: '+16%' },
-  { Icon: Users,         val: 6,  lbl: 'Rescue Teams Active',  sub: '3 currently en route',  color: C.yellow, tag: 'Deployed', trend: 'Live'  },
-  { Icon: AlertTriangle, val: 3,  lbl: 'Critical Zones',       sub: 'Immediate action req.', color: C.orange, tag: 'Urgent',   trend: '⚠ Act' },
-  { Icon: Clock,         val: 18, lbl: 'Hours Since Quake',    sub: 'Golden window active',  color: C.blue,   tag: '72hr',     trend: '54hr left' },
-]
-
-function Card({ Icon, val, lbl, sub, color, tag, trend, enabled, delay }) {
+function Card({ Icon, val, lbl, sub, color, tag, trend, enabled }) {
   const count = useCounter(val, 1600, enabled)
   const [hov, setHov] = useState(false)
 
@@ -82,9 +76,24 @@ function Card({ Icon, val, lbl, sub, color, tag, trend, enabled, delay }) {
 
 export default function StatsDashboard() {
   const [ref, inView] = useInView(0.1)
+  const { stats, survivors, teams } = useRealtime()
+
+  const detectedCount = stats?.survivors_detected ?? survivors.length ?? 14
+  const activeTeamsCount = stats?.teams_active ?? teams.length ?? 6
+  const criticalZonesCount = stats?.critical_zones ?? survivors.filter(s => s.zone === 'CRITICAL' && s.status !== 'rescued').length ?? 3
+  const hoursSinceQuake = Math.round(stats?.hours_since_quake ?? 18)
+  const hoursRemaining = Math.round(stats?.hours_remaining ?? (72 - hoursSinceQuake))
+
+  const cards = [
+    { Icon: HeartPulse,    val: detectedCount,     lbl: 'Survivors Detected',  sub: `${stats?.survivors_rescued ?? 0} rescued`, color: C.red,    tag: 'Critical', trend: 'Live' },
+    { Icon: Users,         val: activeTeamsCount,  lbl: 'Rescue Teams Active',  sub: `${teams.filter(t => t.status === 'EN ROUTE').length} en route`, color: C.yellow, tag: 'Deployed', trend: 'Live'  },
+    { Icon: AlertTriangle, val: criticalZonesCount,lbl: 'Critical Zones',       sub: 'Immediate action req.', color: C.orange, tag: 'Urgent',   trend: '⚠ Act' },
+    { Icon: Clock,         val: hoursSinceQuake,   lbl: 'Hours Since Quake',    sub: 'Golden window active',  color: C.blue,   tag: '72hr',     trend: `${hoursRemaining}h left` },
+  ]
+
   return (
     <div ref={ref} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
-      {CARDS.map((c, i) => (
+      {cards.map((c, i) => (
         <div key={c.lbl} style={{
           opacity:    inView ? 1 : 0,
           transform:  inView ? 'translateY(0) scale(1)' : 'translateY(32px) scale(0.96)',

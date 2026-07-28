@@ -3,8 +3,14 @@ import requests as req
 import random
 from utils.fuzzy_engine import get_survival_zone
 from utils.pso_optimizer import optimize_rescue_routes
+from realtime import state as rt_state
 
 api = Blueprint('api', __name__)
+
+# ─── Full State Snapshot (for initial hydration) ──────────────────
+@api.route('/state', methods=['GET'])
+def get_state():
+    return jsonify(rt_state.get_snapshot())
 
 # ─── Health Check ─────────────────────────────────
 @api.route('/health', methods=['GET'])

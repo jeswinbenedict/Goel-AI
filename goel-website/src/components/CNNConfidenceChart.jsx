@@ -3,8 +3,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Cpu } from 'lucide-react'
 import { C, card, cardHover, badge } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
-const DATA = [
+const DEFAULT_DATA = [
   { name: 'S#1', confidence: 94, zone: 'CRITICAL', loc: 'Block A · F2' },
   { name: 'S#2', confidence: 88, zone: 'CRITICAL', loc: 'Block C · F1' },
   { name: 'S#3', confidence: 72, zone: 'MODERATE', loc: 'Block B · F3' },
@@ -17,7 +18,7 @@ const ZONE_COLOR = { CRITICAL: C.red, MODERATE: C.yellow, LOW: C.green }
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
-  const c = ZONE_COLOR[d.zone]
+  const c = ZONE_COLOR[d.zone] || C.green
   return (
     <div style={{
       background: 'rgba(12,12,16,0.98)',
@@ -26,7 +27,7 @@ const CustomTooltip = ({ active, payload }) => {
       backdropFilter: 'blur(20px)',
       boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)`,
     }}>
-      <div style={{ fontSize: '13px', fontWeight: 700, color: '#f5f5f7', marginBottom: '6px' }}>Survivor {d.name.replace('S','#')}</div>
+      <div style={{ fontSize: '13px', fontWeight: 700, color: '#f5f5f7', marginBottom: '6px' }}>Survivor {d.name}</div>
       <div style={{ fontSize: '12px', color: '#6e6e73', marginBottom: '4px' }}>{d.loc}</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '100px', color: 'white', background: c }}>{d.zone}</span>
@@ -40,6 +41,14 @@ export default function CNNConfidenceChart() {
   const [ref, inView] = useInView()
   const [hov, setHov] = useState(false)
   const [activeIdx, setActiveIdx] = useState(null)
+  const { survivors } = useRealtime()
+
+  const chartData = survivors && survivors.length > 0 ? survivors.slice(0, 10).map(s => ({
+    name: `S#${s.id}`,
+    confidence: s.confidence || s.conf || 75,
+    zone: s.zone || 'CRITICAL',
+    loc: s.loc || 'Disaster Zone',
+  })) : DEFAULT_DATA
 
   return (
     <div
@@ -92,7 +101,7 @@ export default function CNNConfidenceChart() {
       {/* Chart */}
       <ResponsiveContainer width="100%" height={220}>
         <BarChart
-          data={DATA}
+          data={chartData}
           margin={{ top: 8, right: 8, bottom: 4, left: -16 }}
           onMouseLeave={() => setActiveIdx(null)}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -113,12 +122,12 @@ export default function CNNConfidenceChart() {
           <ReferenceLine y={70} stroke="#3a3a3c" strokeDasharray="4 4" strokeWidth={1.5} />
           <Bar dataKey="confidence" radius={[8, 8, 0, 0]} maxBarSize={56}
             onMouseEnter={(_, i) => setActiveIdx(i)}>
-            {DATA.map((entry, i) => (
+            {chartData.map((entry, i) => (
               <Cell
                 key={i}
-                fill={ZONE_COLOR[entry.zone]}
+                fill={ZONE_COLOR[entry.zone] || C.green}
                 opacity={activeIdx === null || activeIdx === i ? 1 : 0.35}
-                style={{ filter: activeIdx === i ? `drop-shadow(0 0 8px ${ZONE_COLOR[entry.zone]}80)` : 'none', transition: 'opacity 0.2s ease' }}
+                style={{ filter: activeIdx === i ? `drop-shadow(0 0 8px ${ZONE_COLOR[entry.zone] || C.green}80)` : 'none', transition: 'opacity 0.2s ease' }}
               />
             ))}
           </Bar>

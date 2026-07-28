@@ -2,12 +2,7 @@ import { useState } from 'react'
 import { ChevronRight, GitBranch } from 'lucide-react'
 import { C, card, cardHover, badge, label } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
-
-const ZONES = [
-  { level: 'CRITICAL', count: 2, score: '78–100', desc: 'Strong heat signature · High structural void probability via CNN + ANN', action: 'Deploy rescue team immediately', color: C.red    },
-  { level: 'MODERATE', count: 2, score: '40–77',  desc: 'Medium heat signal · Uncertain structural data · Fuzzy boundary active', action: 'Deploy within 2 hours',         color: C.yellow },
-  { level: 'LOW',      count: 1, score: '0–39',   desc: 'Faint signals only · Survival unlikely but not impossible',              action: 'Remote monitoring assigned',    color: C.green  },
-]
+import { useRealtime } from '../realtime/RealtimeProvider'
 
 function ZoneRow({ zone, inView, delay }) {
   const [hov, setHov] = useState(false)
@@ -50,6 +45,18 @@ function ZoneRow({ zone, inView, delay }) {
 export default function FuzzyZoneCard() {
   const [ref, inView] = useInView()
   const [hov, setHov] = useState(false)
+  const { survivors } = useRealtime()
+
+  const criticalCount = survivors ? survivors.filter(s => s.zone === 'CRITICAL' && s.status !== 'rescued').length : 2
+  const moderateCount = survivors ? survivors.filter(s => s.zone === 'MODERATE' && s.status !== 'rescued').length : 2
+  const lowCount = survivors ? survivors.filter(s => s.zone === 'LOW' && s.status !== 'rescued').length : 1
+
+  const zones = [
+    { level: 'CRITICAL', count: criticalCount, score: '78–100', desc: 'Strong heat signature · High structural void probability via CNN + ANN', action: 'Deploy rescue team immediately', color: C.red    },
+    { level: 'MODERATE', count: moderateCount, score: '40–77',  desc: 'Medium heat signal · Uncertain structural data · Fuzzy boundary active', action: 'Deploy within 2 hours',         color: C.yellow },
+    { level: 'LOW',      count: lowCount,      score: '0–39',   desc: 'Faint signals only · Survival unlikely but not impossible',              action: 'Remote monitoring assigned',    color: C.green  },
+  ]
+
   return (
     <div
       ref={ref}
@@ -68,13 +75,13 @@ export default function FuzzyZoneCard() {
         <div style={badge(C.purple)}><GitBranch size={11} strokeWidth={2.5} />IF-THEN Rules</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-        {ZONES.map((z, i) => <ZoneRow key={z.level} zone={z} inView={inView} delay={0.15 + i * 0.1} />)}
+        {zones.map((z, i) => <ZoneRow key={z.level} zone={z} inView={inView} delay={0.15 + i * 0.1} />)}
       </div>
       <div style={{
         marginTop: '16px', padding: '10px 14px', borderRadius: '12px', textAlign: 'center',
         background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
       }}>
-        <p style={{ fontSize: '11px', color: C.t4 }}>Trained on 10,000+ earthquake rescue records</p>
+        <p style={{ fontSize: '11px', color: C.t4 }}>Live Fuzzy Scoring from Realtime Engine</p>
       </div>
     </div>
   )

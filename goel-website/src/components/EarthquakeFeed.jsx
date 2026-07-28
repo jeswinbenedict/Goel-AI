@@ -3,6 +3,7 @@ import { Globe, RefreshCw, Layers, Wifi, WifiOff } from 'lucide-react'
 import { C, card, cardHover, badge, label } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
 import { api } from '../api/client'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
 function getMag(mag) {
   if (mag >= 7) return { color: C.red,    label: 'MAJOR'  }
@@ -12,6 +13,7 @@ function getMag(mag) {
 }
 
 export default function EarthquakeFeed() {
+  const { earthquakes: realtimeQuakes, connected } = useRealtime()
   const [quakes,  setQuakes]  = useState([])
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(null)
@@ -21,10 +23,22 @@ export default function EarthquakeFeed() {
   const [source,  setSource]  = useState(null)
   const [ref, inView] = useInView()
 
+  useEffect(() => {
+    if (realtimeQuakes && realtimeQuakes.length > 0) {
+      const normalized = realtimeQuakes.map(q => ({
+        properties: { mag: q.magnitude, place: q.place, time: q.time },
+        geometry:   { coordinates: [q.lng, q.lat, q.depth] },
+      }))
+      setQuakes(normalized.slice(0, 6))
+      setSource(connected ? 'websocket' : 'backend')
+      setUpdated(new Date().toLocaleTimeString())
+      setLoading(false)
+    }
+  }, [realtimeQuakes, connected])
+
   const load = useCallback(async () => {
     setLoading(true); setError(null); setSpin(true)
     try {
-      // Try Flask backend proxy first
       const data = await api.earthquakeLive()
       const normalized = data.earthquakes.map(q => ({
         properties: { mag: q.magnitude, place: q.place, time: q.time },
@@ -34,7 +48,6 @@ export default function EarthquakeFeed() {
       setSource('backend')
       setUpdated(new Date().toLocaleTimeString())
     } catch {
-      // Fallback to direct USGS
       try {
         const res  = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson')
         const data = await res.json()
@@ -50,10 +63,10 @@ export default function EarthquakeFeed() {
   }, [])
 
   useEffect(() => {
-    load()
-    const interval = setInterval(load, 60000)
-    return () => clearInterval(interval)
-  }, [load])
+    if (!realtimeQuakes || realtimeQuakes.length === 0) {
+      load()
+    }
+  }, [load, realtimeQuakes])
 
   return (
     <div

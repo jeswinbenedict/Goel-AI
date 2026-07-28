@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Activity, ExternalLink, Menu, X } from 'lucide-react'
 import { C } from '../styles/theme'
+import ConnectionStatus from './ConnectionStatus'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -78,6 +79,7 @@ export default function Navbar() {
 
           {/* ── Center status pills ── */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ConnectionStatus />
             {[
               { dot: C.red,   label: 'Active Emergency' },
               { dot: C.blue,  label: 'USGS Feed'        },

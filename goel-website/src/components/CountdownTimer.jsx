@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { C, card, cardHover } from '../styles/theme'
 import { useInView } from '../hooks/useInView'
 import { AlertTriangle, Clock, Flame } from 'lucide-react'
+import { useRealtime } from '../realtime/RealtimeProvider'
 
-// Set earthquake time — 18 hours ago from now
-const QUAKE_TIME = Date.now() - 18 * 60 * 60 * 1000
 const GOLDEN_WINDOW = 72 * 60 * 60 * 1000
 
 function pad(n) { return String(n).padStart(2, '0') }
@@ -13,13 +12,15 @@ export default function CountdownTimer() {
   const [ref, inView] = useInView()
   const [hov, setHov] = useState(false)
   const [now, setNow] = useState(Date.now())
+  const { quakeTime } = useRealtime()
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(t)
   }, [])
 
-  const elapsed   = now - QUAKE_TIME
+  const quakeTimestamp = quakeTime ? quakeTime * 1000 : (Date.now() - 18 * 60 * 60 * 1000)
+  const elapsed   = now - quakeTimestamp
   const remaining = Math.max(GOLDEN_WINDOW - elapsed, 0)
   const pct       = Math.min((elapsed / GOLDEN_WINDOW) * 100, 100)
 

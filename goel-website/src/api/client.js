@@ -9,6 +9,7 @@ const post = (path, body) => fetch(`${BASE}${path}`, {
 
 export const api = {
   health:          ()             => get('/api/health'),
+  getState:        ()             => get('/api/state'),
   fuzzyScore:      (heat, void_, hours) => post('/api/fuzzy-score',      { heat, void: void_, hours }),
   optimizeRoutes:  (survivors, teams)   => post('/api/optimize-routes',  { survivors, teams }),
   earthquakeLive:  ()             => get('/api/earthquake-live'),

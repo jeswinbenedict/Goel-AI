@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Activity, ExternalLink, Menu, X } from 'lucide-react'
+import { ExternalLink, Menu, X } from 'lucide-react'
 import { C } from '../styles/theme'
 import ConnectionStatus from './ConnectionStatus'
 
@@ -54,8 +54,8 @@ export default function Navbar() {
           {/* ── Logo ── */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '42px', height: '42px', borderRadius: '14px',
-              background: 'linear-gradient(135deg, #FF3B30 0%, #FF6B35 100%)',
+              width: '40px', height: '40px', borderRadius: '12px',
+              background: 'linear-gradient(135deg, #ff3b30 0%, #ff6b35 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 20px rgba(255, 59, 48, 0.45), 0 0 16px rgba(255, 107, 53, 0.25), inset 0 1px 0 rgba(255,255,255,0.3)',
               transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
@@ -64,17 +64,16 @@ export default function Navbar() {
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 6px 26px rgba(255, 59, 48, 0.6), 0 0 20px rgba(255, 107, 53, 0.4)' }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255, 59, 48, 0.45), 0 0 16px rgba(255, 107, 53, 0.25), inset 0 1px 0 rgba(255,255,255,0.3)' }}>
-              {/* Ultra-Crisp Precision Radar-Pulse Icon */}
-              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Outer Radar Search Scope Ring */}
-                <circle cx="14" cy="14" r="8.5" stroke="white" strokeWidth="2.6" strokeOpacity="0.95" />
-                {/* Inner Pulse Spike Waveform */}
-                <path d="M9.5 15L14 9.5L18.5 15" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-                {/* Extended Radar Handle / Directional Ray */}
-                <path d="M20 20L23.5 23.5" stroke="white" strokeWidth="2.6" strokeLinecap="round"/>
-                {/* Target Focal Beacon Node Dot */}
-                <circle cx="25.5" cy="25.5" r="2.2" fill="white" />
-              </svg>
+              <span style={{
+                fontSize: '22px',
+                fontWeight: 900,
+                color: '#ffffff',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                lineHeight: 1,
+                userSelect: 'none'
+              }}>
+                G
+              </span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{

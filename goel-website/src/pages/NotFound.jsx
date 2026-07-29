@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, AlertTriangle, ArrowLeft, Home } from 'lucide-react'
+import { AlertTriangle, ArrowLeft, Home } from 'lucide-react'
 import { C } from '../styles/theme'
 
 export default function NotFound() {
@@ -159,7 +159,7 @@ export default function NotFound() {
             background: 'linear-gradient(135deg, #ff3b30, #ff6b35)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Activity size={12} color="white" strokeWidth={2.5} />
+            <span style={{ fontSize: '14px', fontWeight: 900, color: 'white', fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1 }}>G</span>
           </div>
           <span style={{ fontSize: '12px', fontWeight: 600, color: C.t4 }}>GOEL v1.0 — Rescue Operations Active</span>
         </div>

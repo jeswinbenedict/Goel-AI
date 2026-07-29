@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Cpu, Zap, Network, GitBranch, Satellite, Activity, ArrowDown } from 'lucide-react'
+import { Cpu, Zap, Network, GitBranch, Satellite, ArrowDown } from 'lucide-react'
 import { C } from '../styles/theme'
 import { useInView, useParallax } from '../hooks/useInView'
 import StatsDashboard     from '../components/StatsDashboard'
@@ -309,11 +309,11 @@ export default function Home() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div className="anim-glow" style={{
-              width: '28px', height: '28px', borderRadius: '10px',
+              width: '28px', height: '28px', borderRadius: '9px',
               background: 'linear-gradient(135deg, #ff3b30, #ff6b35)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Activity size={13} color="white" strokeWidth={2.5} />
+              <span style={{ fontSize: '15px', fontWeight: 900, color: 'white', fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1 }}>G</span>
             </div>
             <span style={{ fontSize: '13px', fontWeight: 600, color: C.t4 }}>GOEL v1.0</span>
           </div>

@@ -54,38 +54,58 @@ export default function Navbar() {
           {/* ── Logo ── */}
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
-              width: '40px', height: '40px', borderRadius: '13px',
-              background: 'linear-gradient(135deg, #FF453A 0%, #FF6B35 100%)',
+              width: '42px', height: '42px', borderRadius: '14px',
+              background: 'linear-gradient(135deg, #FF3B30 0%, #FF6B35 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 20px rgba(255,59,48,0.5), 0 0 12px rgba(255,69,58,0.3)',
-              transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+              boxShadow: '0 4px 20px rgba(255, 59, 48, 0.45), 0 0 16px rgba(255, 107, 53, 0.25), inset 0 1px 0 rgba(255,255,255,0.3)',
+              transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
               position: 'relative',
-              overflow: 'hidden'
+              flexShrink: 0
             }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
-              {/* Exact Icon from User Image: Search Magnifying Ring + Inner Pulse Spike + Connected Node Dot */}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.06)'; e.currentTarget.style.boxShadow = '0 6px 26px rgba(255, 59, 48, 0.6), 0 0 20px rgba(255, 107, 53, 0.4)' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255, 59, 48, 0.45), 0 0 16px rgba(255, 107, 53, 0.25), inset 0 1px 0 rgba(255,255,255,0.3)' }}>
+              {/* Ultra-Crisp Precision Radar-Pulse Icon */}
               <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Search / Radar Loop Circle */}
-                <circle cx="15" cy="15" r="9" stroke="white" strokeWidth="2.8" />
-                {/* Inner Seismic Peak / Triangle Wave */}
-                <path d="M10 16L14 11L18 16" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                {/* Extended Line to Node */}
-                <path d="M21 19L24 21" stroke="white" strokeWidth="2.8" strokeLinecap="round"/>
-                {/* Outer Node Dot */}
-                <circle cx="26" cy="22" r="2.2" fill="white"/>
+                {/* Outer Radar Search Scope Ring */}
+                <circle cx="14" cy="14" r="8.5" stroke="white" strokeWidth="2.6" strokeOpacity="0.95" />
+                {/* Inner Pulse Spike Waveform */}
+                <path d="M9.5 15L14 9.5L18.5 15" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+                {/* Extended Radar Handle / Directional Ray */}
+                <path d="M20 20L23.5 23.5" stroke="white" strokeWidth="2.6" strokeLinecap="round"/>
+                {/* Target Focal Beacon Node Dot */}
+                <circle cx="25.5" cy="25.5" r="2.2" fill="white" />
               </svg>
             </div>
-            <div>
-              <div style={{ fontSize: '17px', fontWeight: 900, color: C.t1, letterSpacing: '-0.01em', lineHeight: 1 }}>GOEL</div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{
+                fontSize: '18px',
+                fontWeight: 900,
+                color: '#FFFFFF',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
+              }}>
+                GOEL
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '3px' }}>
                 <span style={{
-                  width: '6px', height: '6px', borderRadius: '50%',
-                  background: C.green, display: 'inline-block',
-                  boxShadow: `0 0 8px ${C.green}`,
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#30D158',
+                  display: 'inline-block',
+                  boxShadow: '0 0 10px #30D158, 0 0 4px #30D158',
                   animation: 'pulseDot 2s ease-in-out infinite',
                 }} />
-                <span style={{ fontSize: '10px', fontWeight: 800, color: C.green, letterSpacing: '0.1em' }}>LIVE</span>
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  color: '#30D158',
+                  letterSpacing: '0.12em',
+                  lineHeight: 1
+                }}>
+                  LIVE
+                </span>
               </div>
             </div>
           </Link>

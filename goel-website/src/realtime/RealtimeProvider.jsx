@@ -150,6 +150,12 @@ export function RealtimeProvider({ children }) {
     socket.emit('request:pso')
   }, [])
 
+  const selectEpicenter = useCallback((quake) => {
+    if (socket && socket.connected) {
+      socket.emit('select:epicenter', quake)
+    }
+  }, [])
+
   const value = {
     connected,
     connecting,
@@ -163,6 +169,7 @@ export function RealtimeProvider({ children }) {
     quakeTime,
     epicenter,
     requestPSO,
+    selectEpicenter,
     refetchState: hydrateSnapshot,
   }
 

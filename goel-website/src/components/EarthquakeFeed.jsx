@@ -13,7 +13,7 @@ function getMag(mag) {
 }
 
 export default function EarthquakeFeed() {
-  const { earthquakes: realtimeQuakes, connected } = useRealtime()
+  const { earthquakes: realtimeQuakes, connected, selectEpicenter, epicenter } = useRealtime()
   const [quakes,  setQuakes]  = useState([])
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(null)
@@ -26,10 +26,17 @@ export default function EarthquakeFeed() {
   useEffect(() => {
     if (realtimeQuakes && realtimeQuakes.length > 0) {
       const normalized = realtimeQuakes.map(q => ({
-        properties: { mag: q.magnitude, place: q.place, time: q.time },
-        geometry:   { coordinates: [q.lng, q.lat, q.depth] },
+        properties: {
+          mag: q.magnitude,
+          place: q.place,
+          time: q.time,
+          url: q.url,
+          tsunami: q.tsunami,
+          alert: q.alert,
+        },
+        geometry: { coordinates: [q.lng, q.lat, q.depth] },
       }))
-      setQuakes(normalized.slice(0, 6))
+      setQuakes(normalized.slice(0, 8))
       setSource(connected ? 'websocket' : 'backend')
       setUpdated(new Date().toLocaleTimeString())
       setLoading(false)
@@ -41,17 +48,24 @@ export default function EarthquakeFeed() {
     try {
       const data = await api.earthquakeLive()
       const normalized = data.earthquakes.map(q => ({
-        properties: { mag: q.magnitude, place: q.place, time: q.time },
-        geometry:   { coordinates: [q.lng, q.lat, q.depth] },
+        properties: {
+          mag: q.magnitude,
+          place: q.place,
+          time: q.time,
+          url: q.url,
+          tsunami: q.tsunami,
+          alert: q.alert,
+        },
+        geometry: { coordinates: [q.lng, q.lat, q.depth] },
       }))
-      setQuakes(normalized.slice(0, 6))
+      setQuakes(normalized.slice(0, 8))
       setSource('backend')
       setUpdated(new Date().toLocaleTimeString())
     } catch {
       try {
-        const res  = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson')
+        const res  = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson')
         const data = await res.json()
-        setQuakes(data.features.slice(0, 6))
+        setQuakes(data.features.slice(0, 8))
         setSource('usgs')
         setUpdated(new Date().toLocaleTimeString())
       } catch {
@@ -68,6 +82,19 @@ export default function EarthquakeFeed() {
     }
   }, [load, realtimeQuakes])
 
+  const handleSelectQuake = (q) => {
+    const quakeObj = {
+      lat: q.geometry.coordinates[1],
+      lng: q.geometry.coordinates[0],
+      place: q.properties.place,
+      magnitude: q.properties.mag,
+      depth: q.geometry.coordinates[2],
+    }
+    if (selectEpicenter) {
+      selectEpicenter(quakeObj)
+    }
+  }
+
   return (
     <div
       ref={ref}
@@ -80,30 +107,32 @@ export default function EarthquakeFeed() {
         transition: 'opacity 0.55s ease 0.1s, transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.1s, border-color 0.35s ease, box-shadow 0.35s ease',
       }}>
 
-      <span style={label}>Real-Time Seismic Activity</span>
+      <span style={label}>Real-Time USGS Seismic Stream</span>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Globe size={16} color={C.t2} strokeWidth={1.75} />
-          <h2 style={{ fontSize: '16px', fontWeight: 700, color: C.t1 }}>Earthquake Feed</h2>
+          <h2 style={{ fontSize: '16px', fontWeight: 700, color: C.t1 }}>Live Earthquake Feed</h2>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {source && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: '5px',
               fontSize: '10px', fontWeight: 700,
-              color: source === 'backend' ? C.green : C.blue,
+              color: source === 'backend' || source === 'websocket' ? C.green : C.blue,
               padding: '3px 10px', borderRadius: '100px',
-              background: source === 'backend' ? `${C.green}12` : `${C.blue}12`,
-              border: `1px solid ${source === 'backend' ? C.green : C.blue}25`,
+              background: source === 'backend' || source === 'websocket' ? `${C.green}12` : `${C.blue}12`,
+              border: `1px solid ${source === 'backend' || source === 'websocket' ? C.green : C.blue}25`,
             }}>
-              {source === 'backend'
+              {source === 'websocket'
+                ? <><Wifi size={10} strokeWidth={2.5} /> Live WS</>
+                : source === 'backend'
                 ? <><Wifi size={10} strokeWidth={2.5} /> Flask API</>
                 : <><WifiOff size={10} strokeWidth={2.5} /> USGS Direct</>}
             </div>
           )}
           <div style={badge(C.green)}>
             <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: C.green, display: 'inline-block' }} />
-            USGS
+            USGS Live
           </div>
           <button
             onClick={load}
@@ -123,7 +152,7 @@ export default function EarthquakeFeed() {
         </div>
       </div>
 
-      {updated && <p style={{ fontSize: '11px', color: C.t4, marginBottom: '16px' }}>Updated {updated}</p>}
+      {updated && <p style={{ fontSize: '11px', color: C.t4, marginBottom: '16px' }}>Updated {updated} · Click any earthquake to center operational rescue map</p>}
 
       {loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -157,16 +186,22 @@ export default function EarthquakeFeed() {
             const s     = getMag(mag)
             const time  = new Date(q.properties.time)
             const depth = q.geometry.coordinates[2]
+            const isCurrentEpicenter = epicenter?.place === q.properties.place
+
             return (
               <div key={i}
+                onClick={() => handleSelectQuake(q)}
+                title="Click to set as active emergency operation zone"
                 style={{
                   borderRadius: '14px', padding: '12px 14px',
                   display: 'flex', alignItems: 'center', gap: '12px',
-                  background: `${s.color}08`, border: `1px solid ${s.color}20`,
-                  transition: 'all 0.2s ease', cursor: 'default',
+                  background: isCurrentEpicenter ? `${C.red}18` : `${s.color}08`,
+                  border: `1px solid ${isCurrentEpicenter ? C.red : `${s.color}20`}`,
+                  transition: 'all 0.2s ease', cursor: 'pointer',
+                  position: 'relative',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = `${s.color}13`; e.currentTarget.style.transform = 'scale(1.008)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = `${s.color}08`; e.currentTarget.style.transform = 'scale(1)' }}>
+                onMouseEnter={e => { e.currentTarget.style.background = `${s.color}16`; e.currentTarget.style.transform = 'scale(1.008)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = isCurrentEpicenter ? `${C.red}18` : `${s.color}08`; e.currentTarget.style.transform = 'scale(1)' }}>
                 <div style={{
                   minWidth: '54px', textAlign: 'center', padding: '8px 6px',
                   borderRadius: '12px', background: `${s.color}15`,
@@ -175,14 +210,33 @@ export default function EarthquakeFeed() {
                   <div style={{ fontSize: '9px', fontWeight: 800, color: s.color, letterSpacing: '0.08em', marginTop: '2px' }}>{s.label}</div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 500, color: C.t1, marginBottom: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {q.properties.place}
-                  </p>
-                  <div style={{ display: 'flex', gap: '14px', fontSize: '11px', color: C.t3 }}>
-                    <span>{time.toLocaleDateString()}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: C.t1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                      {q.properties.place}
+                    </p>
+                    {isCurrentEpicenter && (
+                      <span style={{ fontSize: '9px', fontWeight: 800, color: C.red, background: `${C.red}20`, padding: '2px 6px', borderRadius: '4px' }}>
+                        ACTIVE TARGET
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '11px', color: C.t3 }}>
+                    <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Layers size={10} strokeWidth={1.75} />{depth}km depth
                     </span>
+                    {q.properties.url && (
+                      <a
+                        href={q.properties.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ color: C.blue, textDecoration: 'none', fontWeight: 600 }}
+                        title="View official USGS event report"
+                      >
+                        USGS Report ↗
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>

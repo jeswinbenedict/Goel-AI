@@ -58,19 +58,24 @@ def optimize_routes():
 @api.route('/earthquake-live', methods=['GET'])
 def earthquake_live():
     try:
-        url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
-        response = req.get(url, timeout=10)
-        data     = response.json()
-
+        from realtime.engine import fetch_usgs_feed
+        features = fetch_usgs_feed()
         quakes = []
-        for f in data['features'][:10]:
+        for f in features[:15]:
+            props = f.get('properties', {})
+            geom = f.get('geometry', {}).get('coordinates', [0, 0, 0])
             quakes.append({
-                'magnitude': f['properties']['mag'],
-                'place':     f['properties']['place'],
-                'time':      f['properties']['time'],
-                'lat':       f['geometry']['coordinates'][1],
-                'lng':       f['geometry']['coordinates'][0],
-                'depth':     f['geometry']['coordinates'][2],
+                'id': f.get('id'),
+                'magnitude': props.get('mag', 0),
+                'place': props.get('place', 'Unknown region'),
+                'time': props.get('time'),
+                'url': props.get('url'),
+                'tsunami': props.get('tsunami', 0),
+                'alert': props.get('alert'),
+                'felt': props.get('felt'),
+                'lat': geom[1],
+                'lng': geom[0],
+                'depth': geom[2],
             })
 
         return jsonify({

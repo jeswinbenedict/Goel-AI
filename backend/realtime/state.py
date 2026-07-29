@@ -220,7 +220,7 @@ BLOCKS = ['Sector Alpha', 'Sector Bravo', 'Sector Charlie', 'Sector Delta', 'Sec
 
 
 def update_epicenter_from_quake(quake):
-    """Update active operation epicenter when a significant earthquake is detected."""
+    """Update active operation epicenter when a real USGS earthquake is detected."""
     global _epicenter, _epicenter_place
     with _lock:
         lat = quake.get('lat')
@@ -229,11 +229,19 @@ def update_epicenter_from_quake(quake):
         if lat is not None and lng is not None:
             _epicenter = [float(lat), float(lng)]
             _epicenter_place = place
-            # Reposition rescue teams to new epicenter perimeter
+            # Reposition initial active survivors around real earthquake coordinates
+            for i, surv in enumerate(_survivors):
+                surv['pos'] = [
+                    round(float(lat) + random.uniform(-SPREAD, SPREAD), 6),
+                    round(float(lng) + random.uniform(-SPREAD, SPREAD), 6)
+                ]
+                surv['loc'] = f'{place} (Sector {chr(65 + i)})'
+
+            # Reposition rescue teams to real earthquake perimeter
             for i, team in enumerate(_teams):
                 team['pos'] = [
-                    round(lat + (0.01 * (i + 1)), 6),
-                    round(lng + (0.01 * (i + 1)), 6)
+                    round(float(lat) + (0.008 * (i + 1)), 6),
+                    round(float(lng) + (0.008 * (i + 1)), 6)
                 ]
                 team['status'] = 'EN ROUTE'
 

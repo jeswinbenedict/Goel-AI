@@ -17,8 +17,57 @@ from utils.fuzzy_engine import get_survival_zone
 from utils.pso_optimizer import optimize_rescue_routes
 
 
+def fetch_usgs_feed():
+    """Fetch live earthquake features from USGS real-time feeds with fallbacks."""
+    urls = [
+        'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson',
+        'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson',
+        'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
+    ]
+    for url in urls:
+        try:
+            resp = requests.get(url, timeout=8)
+            if resp.status_code == 200:
+                data = resp.json()
+                features = data.get('features', [])
+                if features:
+                    return features
+        except Exception as e:
+            print(f"[USGS Fetch] Warning for {url}: {e}")
+            continue
+    return []
+
+
 def start_all(socketio):
     """Start all background workers. Call once from app.py."""
+    # Pre-seed state with live real-world USGS data immediately on launch
+    try:
+        features = fetch_usgs_feed()
+        for f in features[:20]:
+            props = f.get('properties', {})
+            geom = f.get('geometry', {}).get('coordinates', [0, 0, 0])
+            state.add_earthquake({
+                'id': f.get('id'),
+                'magnitude': props.get('mag', 0),
+                'place': props.get('place', 'Unknown region'),
+                'time': props.get('time'),
+                'url': props.get('url'),
+                'tsunami': props.get('tsunami', 0),
+                'alert': props.get('alert'),
+                'felt': props.get('felt'),
+                'lat': geom[1],
+                'lng': geom[0],
+                'depth': geom[2],
+            })
+        quakes = state.get_earthquakes()
+        if quakes:
+            # Pick highest magnitude recent earthquake as active epicenter
+            top_quake = max(quakes, key=lambda q: q.get('magnitude', 0))
+            state.update_epicenter_from_quake(top_quake)
+            print(f"  [OK] Initialized live earthquake epicenter: {top_quake['place']} (M{top_quake['magnitude']})")
+    except Exception as e:
+        print(f"  [WARNING] Initial USGS seed error: {e}")
+
     socketio.start_background_task(usgs_monitor, socketio)
     socketio.start_background_task(survivor_simulator, socketio)
     socketio.start_background_task(seismic_streamer, socketio)
@@ -34,41 +83,50 @@ def start_all(socketio):
 # ═══════════════════════════════════════════════════════════════════
 def usgs_monitor(socketio):
     """Poll USGS every 30s, emit new earthquakes."""
-    URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson'
-
     while True:
         try:
-            resp = requests.get(URL, timeout=10)
-            data = resp.json()
+            features = fetch_usgs_feed()
+            new_count = 0
+            latest_quake = None
 
-            for f in data.get('features', [])[:15]:
+            for f in features[:20]:
+                props = f.get('properties', {})
+                geom = f.get('geometry', {}).get('coordinates', [0, 0, 0])
                 quake = {
-                    'magnitude': f['properties']['mag'],
-                    'place':     f['properties']['place'],
-                    'time':      f['properties']['time'],
-                    'lat':       f['geometry']['coordinates'][1],
-                    'lng':       f['geometry']['coordinates'][0],
-                    'depth':     f['geometry']['coordinates'][2],
+                    'id': f.get('id'),
+                    'magnitude': props.get('mag', 0),
+                    'place': props.get('place', 'Unknown region'),
+                    'time': props.get('time'),
+                    'url': props.get('url'),
+                    'tsunami': props.get('tsunami', 0),
+                    'alert': props.get('alert'),
+                    'felt': props.get('felt'),
+                    'lat': geom[1],
+                    'lng': geom[0],
+                    'depth': geom[2],
                 }
                 is_new = state.add_earthquake(quake)
                 if is_new:
-                    # Update active operation epicenter to latest real-time quake location
-                    state.update_epicenter_from_quake(quake)
-                    socketio.emit('earthquake:new', quake)
-                    socketio.emit('epicenter:updated', state.get_epicenter_info())
+                    new_count += 1
+                    if not latest_quake:
+                        latest_quake = quake
 
-                    # Add to timeline
-                    mag = quake['magnitude']
-                    evt = state.add_timeline_event({
-                        'time': time.strftime('%H:%M'),
-                        'label': f'M{mag} Earthquake Detected',
-                        'desc': f'{quake["place"]} · Depth {quake["depth"]:.1f}km · Operational map centered',
-                        'color': '#ff3b30' if mag >= 6 else '#ff9500' if mag >= 4 else '#ffd60a',
-                        'status': 'done',
-                    })
-                    socketio.emit('timeline:event', evt)
+            if latest_quake and new_count > 0:
+                state.update_epicenter_from_quake(latest_quake)
+                socketio.emit('earthquake:new', latest_quake)
+                socketio.emit('epicenter:updated', state.get_epicenter_info())
 
-            # Always emit full list for any late-joining clients
+                mag = latest_quake['magnitude']
+                evt = state.add_timeline_event({
+                    'time': time.strftime('%H:%M'),
+                    'label': f'M{mag} Earthquake Detected',
+                    'desc': f'{latest_quake["place"]} · Depth {latest_quake["depth"]:.1f}km · Operational map centered',
+                    'color': '#ff3b30' if mag >= 6 else '#ff9500' if mag >= 4 else '#ffd60a',
+                    'status': 'done',
+                })
+                socketio.emit('timeline:event', evt)
+
+            # Emit updated full list to clients
             socketio.emit('earthquake:list', state.get_earthquakes())
 
         except Exception as e:

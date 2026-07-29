@@ -47,10 +47,17 @@ def handle_connect(auth=None):
 def handle_disconnect(reason=None):
     print("Client disconnected")
 
-# ── Allow manual triggers via WebSocket too ───────────────────────
 @socketio.on('request:pso')
 def handle_pso_request():
     """Client can request a manual PSO re-run."""
+    engine._run_pso_update(socketio)
+
+@socketio.on('select:epicenter')
+def handle_select_epicenter(quake):
+    """Client can select any real earthquake from the feed as active operation zone."""
+    state.update_epicenter_from_quake(quake)
+    emit('epicenter:updated', state.get_epicenter_info(), broadcast=True)
+    emit('state:snapshot', state.get_snapshot(), broadcast=True)
     engine._run_pso_update(socketio)
 
 @socketio.on('request:fuzzy')
